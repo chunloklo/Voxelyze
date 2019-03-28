@@ -76,6 +76,8 @@ public:
 	void clear(); //!< Erases all voxels and materials and restores the voxelyze object to its default (empty) state.
 	bool loadJSON(const char* jsonFilePath); //!< Clears this voxelyze instance and loads fresh from a *.vxl.json file. The details of this file format are available in the Voxelyze user guide. @param[in] jsonFilePath path to the json file
 	bool saveJSON(const char* jsonFilePath); //!< Saves this voxelyze instance to a json file. All voxels are saved at their default locations - the state is not captured. It is recommended to specify the standard *.vxl.json file suffix. @param[in] jsonFilePath path to the desired json file. Will create or overwrite a file at this path.
+	bool writeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer>& w);
+	bool readJSON(rapidjson::Value& vxl);
 
 	bool doLinearSolve(/*SOLVER thisSolver, float stepPercentage = 1.0f*/); //!< Linearizes the voxelyze object and does a one-time linear solution to set the position and orientation of all voxels. The current state of the voxel object will be discarded. Currently only the pardiso solver is supported. To make use of this feature voxelyze must be built with PARDISO_5 defined in the preprocessor. A valid pardiso 5 license file and library file (i.e libpardiso500-WIN-X86-64.dll for windows) should be obtained from www.pardiso-project.org and placed in the directory your executable will be run from.
 
@@ -179,9 +181,6 @@ private:
 	void updateCollisions();
 	void clearCollisions(); //remove all existing collisions
 	void regenerateCollisions(float threshRadiusSq);
-
-	bool writeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer>& w);
-	bool readJSON(rapidjson::Value& vxl);
 
 };
 

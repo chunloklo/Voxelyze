@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -14,18 +14,21 @@
     <ProjectGuid>{2EFE3A99-704B-426D-9E14-03E3800418FE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Voxelyze</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -99,6 +102,7 @@
     <ClInclude Include="include\VX_MaterialLink.h" />
     <ClInclude Include="include\VX_MaterialVoxel.h" />
     <ClInclude Include="include\VX_Mesh.h" />
+    <ClInclude Include="include\VX_MeshRender.h" />
     <ClInclude Include="include\VX_Utils.h" />
     <ClInclude Include="include\VX_Voxel.h" />
   </ItemGroup>
@@ -111,7 +115,7 @@
     <ClCompile Include="src\VX_Material.cpp" />
     <ClCompile Include="src\VX_MaterialLink.cpp" />
     <ClCompile Include="src\VX_MaterialVoxel.cpp" />
-    <ClCompile Include="src\VX_Mesh.cpp" />
+    <ClCompile Include="src\VX_MeshRender.cpp" />
     <ClCompile Include="src\VX_Voxel.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

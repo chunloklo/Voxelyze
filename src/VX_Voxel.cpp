@@ -20,7 +20,7 @@ See <http://www.opensource.org/licenses/lgpl-3.0.html> for license details.
 #include <iostream>
 #endif
 
-CVX_Voxel::CVX_Voxel(CVX_MaterialVoxel* material, short indexX, short indexY, short indexZ) 
+CVX_Voxel::CVX_Voxel(CVX_MaterialVoxel* material, short indexX, short indexY, short indexZ)
 {
 	for (int i=0; i<6; i++) links[i]=NULL;
 	mat = material;
@@ -105,14 +105,34 @@ bool CVX_Voxel::isFailed() const
 	return false;
 }
 
+Vec3D<double> CVX_Voxel::baseSize() const {
+	Vec3D<double> size = mat->size();
+	if (mat->muscleAxis == CVX_Link::linkAxis::X_AXIS) {
+		size.setX(size.getX()*(1 + temp * mat->alphaCTE));
+	}
+	else if (mat->muscleAxis == CVX_Link::linkAxis::Y_AXIS) {
+		size.setY(size.getY()*(1 + temp * mat->alphaCTE));
+	}
+	else if (mat->muscleAxis == CVX_Link::linkAxis::Z_AXIS) {
+		size.setZ(size.getZ()*(1 + temp * mat->alphaCTE));
+	}
+	else {
+		size = mat->size()*(1 + temp * mat->alphaCTE);
+	}
+	return size;
+}
+
 void CVX_Voxel::setTemperature(float temperature)
 {
 	temp = temperature;
-	for (int i=0; i<6; i++){
-		if (links[i] != NULL) links[i]->updateRestLength();
-	}
-} 
+	 for (int i=0; i<6; i++){
+	 	if (links[i] != NULL) links[i]->updateRestLength();
+	 }
+}
 
+void CVX_Voxel::setPos(Vec3D<double> position) {
+	pos = position;
+}
 
 Vec3D<float> CVX_Voxel::externalForce()
 {
@@ -154,7 +174,6 @@ Vec3D<float> CVX_Voxel::cornerOffset(voxelCorner corner) const
 		}
 		else strains[i] = posLink?1.0:-1.0;
 	}
-
 	return (0.5*baseSize()).Scale(strains);
 }
 
@@ -235,7 +254,7 @@ Vec3D<double> CVX_Voxel::force()
 {
 	//forces from internal bonds
 	Vec3D<double> totalForce(0,0,0);
-	for (int i=0; i<6; i++){ 
+	for (int i=0; i<6; i++){
 		if (links[i]) totalForce += links[i]->force(isNegative((linkDirection)i)); //total force in LCS
 	}
 	totalForce = orient.RotateVec3D(totalForce); //from local to global coordinates
@@ -259,11 +278,11 @@ Vec3D<double> CVX_Voxel::moment()
 {
 	//moments from internal bonds
 	Vec3D<double> totalMoment(0,0,0);
-	for (int i=0; i<6; i++){ 
+	for (int i=0; i<6; i++){
 		if (links[i]) totalMoment += links[i]->moment(isNegative((linkDirection)i)); //total force in LCS
 	}
 	totalMoment = orient.RotateVec3D(totalMoment);
-	
+
 	//other moments
 	if (externalExists()) totalMoment += external()->moment(); //external moments
 	totalMoment -= angularVelocity()*mat->globalDampingRotateC(); //global damping
@@ -275,18 +294,18 @@ void CVX_Voxel::floorForce(float dt, Vec3D<double>* pTotalForce)
 {
 	float CurPenetration = floorPenetration(); //for now use the average.
 
-	if (CurPenetration>=0){ 
+	if (CurPenetration>=0){
 		Vec3D<double> vel = velocity();
 		Vec3D<double> horizontalVel(vel.x, vel.y, 0);
-		
+
 		float normalForce = mat->penetrationStiffness()*CurPenetration;
 		pTotalForce->z += normalForce - mat->collisionDampingTranslateC()*vel.z; //in the z direction: k*x-C*v - spring and damping
 
-		if (isFloorStaticFriction()){ //If this voxel is currently in static friction mode (no lateral motion) 
+		if (isFloorStaticFriction()){ //If this voxel is currently in static friction mode (no lateral motion)
 			assert(horizontalVel.Length2() == 0);
 			float surfaceForceSq = (float)(pTotalForce->x*pTotalForce->x + pTotalForce->y*pTotalForce->y); //use squares to avoid a square root
 			float frictionForceSq = (mat->muStatic*normalForce)*(mat->muStatic*normalForce);
-		
+
 			if (surfaceForceSq > frictionForceSq) setFloorStaticFriction(false); //if we're breaking static friction, leave the forces as they currently have been calculated to initiate motion this time step
 		}
 		else { //even if we just transitioned don't process here or else with a complete lack of momentum it'll just go back to static friction
@@ -301,8 +320,8 @@ Vec3D<float> CVX_Voxel::strain(bool poissonsStrain) const
 {
 	//if no connections in the positive and negative directions of a particular axis, strain is zero
 	//if one connection in positive or negative direction of a particular axis, strain is that strain - ?? and force or constraint?
-	//if connections in both the positive and negative directions of a particular axis, strain is the average. 
-	
+	//if connections in both the positive and negative directions of a particular axis, strain is the average.
+
 	Vec3D<float> intStrRet(0,0,0); //intermediate strain return value. axes according to linkAxis enum
 	int numBondAxis[3] = {0}; //number of bonds in this axis (0,1,2). axes according to linkAxis enum
 	bool tension[3] = {false};
@@ -346,7 +365,7 @@ Vec3D<float> CVX_Voxel::poissonsStrain()
 float CVX_Voxel::transverseStrainSum(CVX_Link::linkAxis axis)
 {
 	if (mat->poissonsRatio() == 0) return 0;
-	
+
 	Vec3D<float> psVec = poissonsStrain();
 
 	switch (axis){
@@ -395,14 +414,14 @@ void CVX_Voxel::enableCollisions(bool enabled, float watchRadius) {
 void CVX_Voxel::generateNearby(int linkDepth, bool surfaceOnly){
 	std::vector<CVX_Voxel*> allNearby;
 	allNearby.push_back(this);
-	
+
 	int iCurrent = 0;
 	for (int k=0; k<linkDepth; k++){
 		int iPassEnd = allNearby.size();
 
 		while (iCurrent != iPassEnd){
 			CVX_Voxel* pV = allNearby[iCurrent++];
-		
+
 			for (int i=0; i<6; i++){
 				CVX_Voxel* pV2 = pV->adjacentVoxel((linkDirection)i);
 				if (pV2 && std::find(allNearby.begin(), allNearby.end(), pV2) == allNearby.end()) allNearby.push_back(pV2);
@@ -413,6 +432,6 @@ void CVX_Voxel::generateNearby(int linkDepth, bool surfaceOnly){
 	nearby->clear();
 	for (std::vector<CVX_Voxel*>::iterator it = allNearby.begin(); it != allNearby.end(); it++){
 		CVX_Voxel* pV = (*it);
-		if (pV->isSurface() && pV != this) nearby->push_back(pV);		
+		if (pV->isSurface() && pV != this) nearby->push_back(pV);
 	}
 }

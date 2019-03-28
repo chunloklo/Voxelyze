@@ -36,14 +36,14 @@ class CVX_Voxel
 {
 public:
 	//! Defines the direction of a link relative to a given voxel.
-	enum linkDirection {	
+	enum linkDirection {
 		X_POS=0,			//!< Positive X direction
 		X_NEG=1,			//!< Negative X direction
 		Y_POS=2,			//!< Positive Y direction
 		Y_NEG=3,			//!< Negative Y direction
 		Z_POS=4,			//!< Positive Z direction
 		Z_NEG=5				//!< Negative Z direction
-	}; 
+	};
 	//! Defines each of 8 corners of a voxel.
 	enum voxelCorner {
 		NNN = 0, //0b000
@@ -54,7 +54,7 @@ public:
 		PNP = 5, //0b101
 		PPN = 6, //0b110
 		PPP = 7  //0b111
-	}; 
+	};
 
 	CVX_Voxel(CVX_MaterialVoxel* material, short indexX, short indexY, short indexZ); //!< Default constuctor. @param [in] material Links this CVX_Material to define the physical properties for this voxel. @param[in] indexX The global X index of this voxel. @param[in] indexY The global Y index of this voxel. @param[in] indexZ The global Z index of this voxel.
 	~CVX_Voxel(); //!< Destructor
@@ -68,7 +68,7 @@ public:
 	short indexZ() {return iz;} //!< Returns the global Z index of this voxel.
 
 	CVX_MaterialVoxel* material() {return mat;} //!<Returns the linked material object containing the physical properties of this voxel.
-	
+
 	bool externalExists() {return ext?true:false;} //!< Returns true if this voxel has had its CVX_External object created. This does not mecessarily imply that this external object actually contains any fixes or forces.
 	CVX_External* external() {if (!ext) ext = new CVX_External(); return ext;} //!< Returns a pointer to this voxel's unique external object that contains fixes, forces, and/or displacements. Allocates a new empty one if it doesn't already exist. Use externalExists() to determine if external() has been previously called at any time.
 
@@ -85,7 +85,8 @@ public:
 	bool isInterior() const {return (boolStates & SURFACE)?true:false;} //!< Returns true if the voxel is surrounded by other voxels on its 6 coordinate faces. Returns false if 1 or more faces are exposed.
 	bool isSurface() const {return !isInterior();} //!< Convenience function to enhance code readibility. The inverse of isInterior(). Returns true 1 or more faces are exposed. Returns false if the voxel is surrounded by other voxels on its 6 coordinate faces.
 
-	Vec3D<double> baseSize() const {return mat->size()*(1+temp*mat->alphaCTE);} //!<Returns the nominal size of this voxel (LCS) accounting for any specified temperature and external actuation. Specifically, returns the zero-stress size of the voxel if all forces/moments were removed.
+	//Vec3D<double> baseSize() const { return mat->size()*(1 + temp * mat->alphaCTE); }
+	Vec3D<double> baseSize() const; //!<Returns the nominal size of this voxel (LCS) accounting for any specified temperature and external actuation. Specifically, returns the zero-stress size of the voxel if all forces/moments were removed.
 	double baseSize(CVX_Link::linkAxis axis) const {return mat->size()[axis]*(1+temp*mat->alphaCTE);} //!<Returns the nominal size of this voxel in the specified axis accounting for any specified temperature and external actuation. Specifically, returns the zero-stress dimension of the voxel if all forces/moments were removed.
 	double baseSizeAverage() const {Vec3D<double> bSize=baseSize(); return (bSize.x+bSize.y+bSize.z)/3.0f;} //!<Returns the average nominal size of the voxel in a zero-stress (no force) state. (X+Y+Z/3)
 
@@ -129,6 +130,9 @@ public:
 
 	float dampingMultiplier() {return 2*mat->_sqrtMass*mat->zetaInternal/previousDt;} //!< Returns the damping multiplier for this voxel. This would normally be called only internally for the internal damping calculations.
 
+	//ADDED BY CHUNLOK LO
+	void setPos(Vec3D<double> position);
+
 	//a couple global convenience functions to have wherever the link enums are used
 	static inline CVX_Link::linkAxis toAxis(linkDirection direction) {return (CVX_Link::linkAxis)((int)direction/2);} //!< Returns the link axis of the specified link direction.
 	static inline linkDirection toDirection(CVX_Link::linkAxis axis, bool positiveDirection) {return (linkDirection)(2*((int)axis) + positiveDirection?0:1);} //!< Returns the link direction of the specified link axis and sign.
@@ -165,7 +169,7 @@ private:
 	Quat3D<double> orient;				//current orientation (GCS)
 	Vec3D<double> angMom;				//current angular momentum (kg*m^2/s) (GCS)
 
-	voxState boolStates;				//single int to store many boolean state values as bit flags according to 
+	voxState boolStates;				//single int to store many boolean state values as bit flags according to
 	void setFloorStaticFriction(bool active) {active? boolStates |= FLOOR_STATIC_FRICTION : boolStates &= ~FLOOR_STATIC_FRICTION;}
 
 	float temp; //0 is no expansion
@@ -175,7 +179,7 @@ private:
 
 	Vec3D<float> strain(bool poissonsStrain) const; //LCS returns voxel strain. if tensionStrain true and no actual tension in that
 	Vec3D<float> poissonsStrain();
-	
+
 	Vec3D<float> pStrain; //cached poissons strain
 	bool poissonsStrainInvalid; //flag for recomputing poissons strain.
 

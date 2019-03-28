@@ -115,6 +115,16 @@ void CVX_Material::writeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer>& w
 		w.EndArray();
 	}
 
+	w.Key("muscleAxis");
+	if (muscleAxis == CVX_Link::linkAxis::NO_AXIS) {
+		w.Int(-1);
+	} else if (muscleAxis == CVX_Link::linkAxis::X_AXIS) {
+		w.Int(0);
+	} else if (muscleAxis == CVX_Link::linkAxis::Y_AXIS) {
+		w.Int(1);
+	} else if (muscleAxis == CVX_Link::linkAxis::Z_AXIS) {
+		w.Int(2);
+	}
 	w.EndObject();
 
 }
@@ -156,7 +166,18 @@ bool CVX_Material::readJSON(rapidjson::Value& m)
 	if (m.HasMember("externalScaleFactor") && m["externalScaleFactor"].IsArray() && m["externalScaleFactor"].Size()==3){
 		for (int i=0; i<3; i++) extScale[i] = m["externalScaleFactor"][i].GetDouble();
 	}
-
+	if (m.HasMember("muscleAxis")) {
+		int axis = m["muscleAxis"].GetInt();
+		if (axis == 0) {
+			muscleAxis = CVX_Link::linkAxis::X_AXIS;
+		}
+		else if (axis == 1) {
+			muscleAxis = CVX_Link::linkAxis::Y_AXIS;
+		}
+		else if (axis == 2) {
+			muscleAxis = CVX_Link::linkAxis::Z_AXIS;
+		}
+	}
 	updateDerived();
 
 	return true;

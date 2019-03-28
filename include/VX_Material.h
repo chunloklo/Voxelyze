@@ -21,6 +21,8 @@ See <http://www.opensource.org/licenses/lgpl-3.0.html> for license details.
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/document.h"
 
+#include "VX_Link.h"
+
 //!Defines the properties a raw material 
 /*!Contains all information relevant to a physical material to be simulated. All units are SI standard.
 
@@ -105,6 +107,9 @@ class CVX_Material {
 	//thermal expansion
 	void setCte(float cte) {alphaCTE=cte;} //!< Defines the coefficient of thermal expansion. @param [in] cte Desired coefficient of thermal expansion per degree C (-INF, INF)
 	float cte() const {return alphaCTE;} //!< Returns the current coefficient of thermal expansion per degree C.
+
+	//added stuff by Chunlok Lo
+	CVX_Link::linkAxis muscleAxis = CVX_Link::linkAxis::NO_AXIS;
 
 protected:
 	std::string error; //!< The last error encountered

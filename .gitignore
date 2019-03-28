@@ -11,5 +11,10 @@ doc/html
 *.suo
 *.user
 
-
-
+.vs/
+Main.cpp
+lib/Debug/
+lib/Voxelyze_d.exe
+lib/Voxelyze_d.ilk
+lib/Voxelyze_d.lib
+lib/Voxelyze_d.pdb

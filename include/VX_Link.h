@@ -37,7 +37,8 @@ class CVX_Link {
 	enum linkAxis {			
 		X_AXIS = 0,			//!< X Axis
 		Y_AXIS = 1,			//!< Y Axis
-		Z_AXIS = 2			//!< Z Axis
+		Z_AXIS = 2,		//!< Z Axis
+		NO_AXIS = 3
 	};
 
 

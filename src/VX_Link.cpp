@@ -136,7 +136,18 @@ bool CVX_Link::isFailed() const
 
 void CVX_Link::updateRestLength()
 {
-	currentRestLength = 0.5*(pVNeg->baseSize(axis) + pVPos->baseSize(axis));
+	double VNegSize = (axis == pVNeg->material()->muscleAxis
+		|| pVNeg->material()->muscleAxis == NO_AXIS) ? pVNeg->baseSize(axis) : pVNeg->baseSizeAverage();
+	double VPosSize = (axis == pVPos->material()->muscleAxis
+		|| pVPos->material()->muscleAxis == NO_AXIS) ? pVPos->baseSize(axis) : pVPos->baseSizeAverage();
+	currentRestLength = 0.5*(VNegSize + VPosSize);
+
+	//double VNegSize = (axis == pVNeg->getMuscleAxis()
+	//	|| pVNeg->getMuscleAxis() == NO_AXIS) ? pVNeg->baseSize(axis) : pVNeg->baseSizeAverage();
+	//double VPosSize = (axis == pVPos->getMuscleAxis()
+	//	|| pVPos->getMuscleAxis() == NO_AXIS) ? pVPos->baseSize(axis) : pVPos->baseSizeAverage();
+	//currentRestLength = 0.5*(VNegSize + VPosSize);
+	//currentRestLength = 0.5*(pVNeg->baseSize(axis) + pVPos->baseSize(axis));
 }
 
 void CVX_Link::updateTransverseInfo()
