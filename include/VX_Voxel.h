@@ -132,6 +132,7 @@ public:
 
 	//ADDED BY CHUNLOK LO
 	void setPos(Vec3D<double> position);
+	void setOrient(Quat3D<double> orientation);
 
 	//a couple global convenience functions to have wherever the link enums are used
 	static inline CVX_Link::linkAxis toAxis(linkDirection direction) {return (CVX_Link::linkAxis)((int)direction/2);} //!< Returns the link axis of the specified link direction.

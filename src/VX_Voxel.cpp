@@ -107,6 +107,7 @@ bool CVX_Voxel::isFailed() const
 
 Vec3D<double> CVX_Voxel::baseSize() const {
 	Vec3D<double> size = mat->size();
+	//size.setX(mat->size().getX()*(1 + temp * mat->alphaCTE));
 	if (mat->muscleAxis == CVX_Link::linkAxis::X_AXIS) {
 		size.setX(size.getX()*(1 + temp * mat->alphaCTE));
 	}
@@ -132,6 +133,10 @@ void CVX_Voxel::setTemperature(float temperature)
 
 void CVX_Voxel::setPos(Vec3D<double> position) {
 	pos = position;
+}
+
+void CVX_Voxel::setOrient(Quat3D<double> orientation) {
+	orient = orientation;
 }
 
 Vec3D<float> CVX_Voxel::externalForce()
